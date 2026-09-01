@@ -5,6 +5,7 @@
  * Description: Integração de cotação de frete para a ENVIE AGORA.
  * Version: 1.0.0
  * Author: Equipe ENVIE AGORA
+ * Author URI: https://envieagora.com.br
  * Requires PHP: 7.4
  */
 
