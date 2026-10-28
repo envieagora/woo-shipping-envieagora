@@ -2,8 +2,8 @@
 /**
  * Plugin Name: WooCommerce ENVIE AGORA Shipping
  * Plugin URI : https://github.com/envieagora/woo-shipping-envieagora
- * Description: Integração de cotação de frete para a ENVIE AGORA.
- * Version: 1.0.0
+ * Description: Integração de cotação de frete da ENVIE AGORA.
+ * Version: 1.0.1
  * Author: Equipe ENVIE AGORA
  * Author URI: https://envieagora.com.br
  * Requires PHP: 7.4

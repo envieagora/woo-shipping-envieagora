@@ -170,7 +170,7 @@ class WC_Envie_Agora_Shipping extends WC_Shipping_Method
             foreach ($result['data']['precosprazos'] as $opcao) {
                 $this->add_rate(array(
                     'id' => $this->id . '_' . $opcao['codigoServico'],
-                    'label' => $opcao['nomeServico'],
+                    'label' => $opcao['nomeServico'] . " (via ENVIE AGORA)",
                     'cost' => (float) $opcao['valor'],
                     'package' => $package,
                 ));
