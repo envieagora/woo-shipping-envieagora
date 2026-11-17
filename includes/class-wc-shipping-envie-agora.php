@@ -20,7 +20,7 @@ class WC_Envie_Agora_Shipping extends WC_Shipping_Method
     public function __construct($instance_id = 0)
     {
         $this->instance_id = absint($instance_id);
-        $this->id = 'envie_agora_shipping_' . $this->instance_id;
+        $this->id = 'envie_agora_shipping';
         $this->method_title = 'ENVIE AGORA';
         $this->method_description = 'Cálculo de frete em tempo real do ENVIE AGORA';
         $this->supports = array('shipping-zones', 'instance-settings');
@@ -98,9 +98,6 @@ class WC_Envie_Agora_Shipping extends WC_Shipping_Method
 
     public function calculate_shipping($package = array()): void
     {
-        WC()->session->set('shipping_for_package_0', '');
-        delete_transient('shipping-transient-version');
-
         $origin_zip = preg_replace('/\D/', '', $this->get_option('zip_origin'));
         $dest_zip = preg_replace('/\D/', '', $package['destination']['postcode']);
 
@@ -111,9 +108,9 @@ class WC_Envie_Agora_Shipping extends WC_Shipping_Method
         } else {
             // Dimensões Dinâmicas baseadas nos itens do carrinho
             $items = WC()->cart->get_cart();
-            $max_l = 16;
-            $max_h = 16;
-            $max_w = 16;
+            $max_l = 13;
+            $max_h = 1;
+            $max_w = 8;
 
             foreach ($items as $item) {
                 $product = $item['data'];
@@ -130,22 +127,28 @@ class WC_Envie_Agora_Shipping extends WC_Shipping_Method
             }
         }
 
+        $weight = (float) WC()->cart->get_cart_contents_weight();
+		
+		if (get_option('woocommerce_weight_unit', 'kg') === "g") {
+			$weight /= 1000;
+		}
+
 
         $body = array(
             'ceporigem' => $origin_zip,
             'cepdestino' => $dest_zip,
-            'peso' => (float) WC()->cart->get_cart_contents_weight(),
+            'peso' => $weight,
             'comprimento' => $max_l,
             'altura' => $max_h,
             'largura' => $max_w,
             'valordeclarado' => (float) WC()->cart->get_subtotal(),
             'avisorecebimento' => 'N',
-            'maopropria' => 'N'
+            'maopropria' => 'N',
         );
 
 
 
-        $response = wp_remote_post('http://envieagora.com.br/api/v1/precosprazos', array(
+        $response = wp_remote_post('https://envieagora.com.br/api/v1/precosprazos', array(
             'method' => 'POST',
             'timeout' => 30,
             'sslverify' => true,
@@ -177,18 +180,4 @@ class WC_Envie_Agora_Shipping extends WC_Shipping_Method
             }
         }
     }
-}
-
-/**
- * Filtro para exibir a mensagem informativa (Dica) no Carrinho e Checkout Moderno
- */
-add_filter('woocommerce_cart_shipping_method_full_label', 'envie_agora_custom_shipping_label', 10, 2);
-
-function envie_agora_custom_shipping_label($label, $method)
-{
-    if (strpos($method->id, 'envie_agora_shipping') !== false) {
-        $msg = '<br><small style="color: #666; font-weight: normal; font-size: 0.85em; display: block; margin-top: 4px;">💡 Veja todas as opções de frete na finalização.</small>';
-        return $label . $msg;
-    }
-    return $label;
 }
